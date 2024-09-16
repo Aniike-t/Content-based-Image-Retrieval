@@ -9,13 +9,19 @@ from SQLmethods.connectDB import ConnectDB
 app = Flask(__name__)
 CORS(app)
 
+
+
 # Configure upload folder
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../storage')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+
+
 # Get database connection and cursor
 c, conn = ConnectDB()
+
+
 
 def save_valid_files(files):
     """
@@ -32,10 +38,17 @@ def save_valid_files(files):
                 valid_files.append(file)
             else:
                 invalid_files.append(file.filename)
+                
+                
+    #Method to get features of image like featuresCNN, colors, etc
+    
+    
     # Save valid files
     for file in valid_files:
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
     return valid_files, invalid_files
+
+
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
