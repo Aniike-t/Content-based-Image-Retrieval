@@ -30,17 +30,111 @@ Software: The software used to process or edit the image.
 '''
 
 
+from PIL import Image
+from PIL.ExifTags import TAGS, GPSTAGS
+import os
+
 def GetMetadata(imagelink):
-    
-    # "filename": filename,
-    # "feature_type": "Metadata",
-    # "feature_value": metadata_name,
-    # "probability/value": metadata_value '''
-    
-      '''  "filename": ./image.png,
-    "feature_type": "Metadata",
-    "feature_value": 'megapixels',
-    "probability/value": 4096 '''
-    
-    # metadata extraction code
-    pass
+    metadata = []
+    try:
+        # Open image
+        image = Image.open(imagelink)
+        
+        # File Information
+        metadata.append({
+            "filename": imagelink,
+            "feature_type": "Metadata",
+            "feature_value": "File Name",
+            "probability/value": os.path.basename(imagelink)
+        })
+        metadata.append({
+            "filename": imagelink,
+            "feature_type": "Metadata",
+            "feature_value": "File Size (bytes)",
+            "probability/value": os.path.getsize(imagelink)
+        })
+        metadata.append({
+            "filename": imagelink,
+            "feature_type": "Metadata",
+            "feature_value": "File Type",
+            "probability/value": image.format
+        })
+        
+        # EXIF Data
+        exif_data = image._getexif()
+        if exif_data:
+            for tag, value in exif_data.items():
+                tag_name = TAGS.get(tag, tag)
+                
+                # Use switch-case (dict approach in Python)
+                tag_switch = {
+                    "DateTimeOriginal": lambda: metadata.append({"filename": imagelink, "feature_type": "Metadata", "feature_value": "Creation Date/Time", "probability/value": value}),
+                    "DateTime": lambda: metadata.append({"filename": imagelink, "feature_type": "Metadata", "feature_value": "Last Modified Date/Time", "probability/value": value}),
+                    "Make": lambda: metadata.append({"filename": imagelink, "feature_type": "Metadata", "feature_value": "Camera Make", "probability/value": value}),
+                    "Model": lambda: metadata.append({"filename": imagelink, "feature_type": "Metadata", "feature_value": "Camera Model", "probability/value": value}),
+                    "FocalLength": lambda: metadata.append({"filename": imagelink, "feature_type": "Metadata", "feature_value": "Focal Length", "probability/value": value}),
+                    "ExposureTime": lambda: metadata.append({"filename": imagelink, "feature_type": "Metadata", "feature_value": "Exposure Time (Shutter Speed)", "probability/value": value}),
+                    "FNumber": lambda: metadata.append({"filename": imagelink, "feature_type": "Metadata", "feature_value": "Aperture", "probability/value": value}),
+                    "ISOSpeedRatings": lambda: metadata.append({"filename": imagelink, "feature_type": "Metadata", "feature_value": "ISO Speed", "probability/value": value}),
+                    "Flash": lambda: metadata.append({"filename": imagelink, "feature_type": "Metadata", "feature_value": "Flash", "probability/value": value}),
+                    "GPSInfo": lambda: metadata.append({"filename": imagelink, "feature_type": "Metadata", "feature_value": "GPS Coordinates", "probability/value": {GPSTAGS.get(k, k): v for k, v in value.items()}}),
+                    "Orientation": lambda: metadata.append({"filename": imagelink, "feature_type": "Metadata", "feature_value": "Orientation", "probability/value": value}),
+                }
+                
+                # Execute the corresponding function if tag_name exists in the dictionary
+                tag_switch.get(tag_name, lambda: None)()
+
+        # Image Resolution & Dimensions
+        metadata.append({
+            "filename": imagelink,
+            "feature_type": "Metadata",
+            "feature_value": "Image Width",
+            "probability/value": image.size[0]
+        })
+        metadata.append({
+            "filename": imagelink,
+            "feature_type": "Metadata",
+            "feature_value": "Image Height",
+            "probability/value": image.size[1]
+        })
+        metadata.append({
+            "filename": imagelink,
+            "feature_type": "Metadata",
+            "feature_value": "Resolution",
+            "probability/value": image.info.get("dpi", "Unknown")
+        })
+
+        # Color Information
+        metadata.append({
+            "filename": imagelink,
+            "feature_type": "Metadata",
+            "feature_value": "Color Profile",
+            "probability/value": image.info.get("icc_profile", "Unknown")
+        })
+        metadata.append({
+            "filename": imagelink,
+            "feature_type": "Metadata",
+            "feature_value": "Bit Depth",
+            "probability/value": image.mode
+        })
+        
+        # Software Information
+        metadata.append({
+            "filename": imagelink,
+            "feature_type": "Metadata",
+            "feature_value": "Software",
+            "probability/value": image.info.get("software", "Unknown")
+        })
+        
+    except Exception as e:
+        metadata.append({
+            "filename": imagelink,
+            "feature_type": "Error",
+            "feature_value": "Error Message",
+            "probability/value": str(e)
+        })
+    print(metadata)
+    return metadata
+  
+  
+GetMetadata('backend/system/methods/HMD_Nokia_8.3_5G_hdr.jpg')
