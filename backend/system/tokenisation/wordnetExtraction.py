@@ -1,29 +1,48 @@
+import os
+from nltk.data import find
 from nltk.corpus import wordnet
-from nltk.tokenize import word_tokenize
 import nltk
+from nltk.tokenize import word_tokenize
 
-# Ensure necessary NLTK data is downloaded
-nltk.download('wordnet')
-nltk.download('punkt')
-nltk.download('punkt_tab')
+# Set NLTK data path to the current folder
+nltk_data_path = os.path.join(os.getcwd(), 'nltk_data')
+if not os.path.exists(nltk_data_path):
+    os.mkdir(nltk_data_path)
 
-def get_synonyms(word):
-    """Get synonyms for a given word from WordNet."""
+nltk.data.path.append(nltk_data_path)
+
+# Ensure necessary NLTK data is downloaded in the same folder
+def download_nltk_data():
+    try:
+        find('corpora/wordnet.zip')
+    except LookupError:
+        nltk.download('wordnet', download_dir=nltk_data_path)
+
+    try:
+        find('tokenizers/punkt.zip')
+    except LookupError:
+        nltk.download('punkt', download_dir=nltk_data_path)
+
+download_nltk_data()
+
+def get_synonyms(word, limit=3):
+    """Get top synonyms for a given word from WordNet, limited to a certain number."""
     synonyms = set()
     for syn in wordnet.synsets(word):
         for lemma in syn.lemmas():
             synonyms.add(lemma.name())
-    return synonyms
+            if len(synonyms) >= limit:
+                return list(synonyms)
+    return list(synonyms)
 
 def tokenize_phrase(phrase):
-    """Tokenize a multi-word phrase into individual words."""
+    """Tokenize multi-word phrases like 'sports car' into individual words."""
     return word_tokenize(phrase)
 
 def process_top_features(features):
-    """Process top features to find synonyms and adjust probabilities."""
+    """Process top features to find top synonyms and adjust probabilities."""
     processed_features = []
     
-    # Sort features by probability in descending order and take the top half
     features_sorted = sorted(features, key=lambda x: x['probability'], reverse=True)
     top_half_count = len(features_sorted) // 2
     top_features = features_sorted[:top_half_count]
@@ -31,18 +50,16 @@ def process_top_features(features):
     for feature in top_features:
         feature_value = feature['feature_value']
         
-        # Tokenize multi-word values
         words = tokenize_phrase(feature_value)
         
-        # For each word, get synonyms and create new feature entries
         for word in words:
-            synonyms = get_synonyms(word)
+            synonyms = get_synonyms(word, limit=3)
             for synonym in synonyms:
                 processed_features.append({
                     "filename": feature['filename'],
                     "feature_type": feature['feature_type'],
                     "feature_value": synonym,
-                    "probability": feature['probability'] / 2
+                    "probability": feature['probability'] / 1.5
                 })
     
     return processed_features

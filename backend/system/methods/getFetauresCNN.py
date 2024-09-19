@@ -10,10 +10,15 @@ from transformers import ViTImageProcessor, ViTForImageClassification
 import torch
 
 class ImageFeatureExtractor:
-    def __init__(self, processor_path, model_path, predictionUpto=6):
-        self.processor = ViTImageProcessor.from_pretrained(processor_path)
-        self.model = ViTForImageClassification.from_pretrained(model_path)
+    def __init__(self, processor_path=None, model_path=None, predictionUpto=5):
+        self.processor = ViTImageProcessor.from_pretrained(
+            processor_path if processor_path else 'google/vit-base-patch16-224'
+        )
+        self.model = ViTForImageClassification.from_pretrained(
+            model_path if model_path else 'google/vit-base-patch16-224'
+        )
         self.predictionUpto = predictionUpto
+
 
     def split_multiword_features(self, feature_data):
         processed_data = []
@@ -29,6 +34,7 @@ class ImageFeatureExtractor:
                     "probability": item['probability']
                 })
         return processed_data
+
 
     def get_features(self, filename):
         img = Image.open(filename)
@@ -52,7 +58,7 @@ class ImageFeatureExtractor:
                 "probability": round(top5_prob[i].item(), 4)
             })
         
-        # Process multi-word features
+        ''' Process multi-word features '''
         processed_feature_list = self.split_multiword_features(feature_list)
         print(len(processed_feature_list))
         
@@ -65,10 +71,10 @@ class ImageFeatureExtractor:
         processed_feature_list_added = processed_feature_list + processed_feature_list_extra
         print(len(processed_feature_list_added))
         
-        # Output the result
+        ''' Output the result '''
         print(processed_feature_list_added)
         return processed_feature_list_added
 
 
-# extractor = ImageFeatureExtractor('backend/system/methods/downloadModel/model/local_vit_processor', 'backend/system/methods/downloadModel/model/local_vit_model')
-# extractor.get_features('backend/system/methods/carneaartree.webp')
+extractor = ImageFeatureExtractor('backend/system/methods/downloadModel/model/local_vit_processor', 'backend/system/methods/downloadModel/model/local_vit_model')
+extractor.get_features('backend/system/methods/image.png')
