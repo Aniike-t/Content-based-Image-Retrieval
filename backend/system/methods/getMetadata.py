@@ -133,8 +133,9 @@ def GetMetadata(imagelink):
             "feature_value": "Error Message",
             "probability/value": str(e)
         })
+        
     print(metadata)
     return metadata
   
   
-GetMetadata('backend/system/methods/HMD_Nokia_8.3_5G_hdr.jpg')
+# GetMetadata('backend/system/methods/HMD_Nokia_8.3_5G_hdr.jpg')

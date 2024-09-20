@@ -123,7 +123,7 @@ class ImageColorAnalyzer:
         """
         basic_colors = self.analyze_colors_basic()
         dominant_colors = self.analyze_dominant_colors()
-        
+        print(basic_colors + dominant_colors)
         return basic_colors + dominant_colors
 
 # Example usage
