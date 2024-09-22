@@ -1,1 +1,0 @@
-''' He kon karnar ahe? '''

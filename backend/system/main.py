@@ -9,6 +9,7 @@ from methods.getMetadata import GetMetadata
 from methods.getFeaturesCNN import ImageFeatureExtractor
 from ThreadPool.ImageProcessorManager import ImageProcessingManager
 from tokenisation.wordnetExtraction import process_top_features
+from tokenisation.SentenceConv import SentenceConverter
 import threading
 import logging
 
