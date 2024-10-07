@@ -1,17 +1,23 @@
-from transformers import ViTImageProcessor, ViTForImageClassification
+from transformers import AutoImageProcessor, AutoModelForImageClassification
 import torch
 from PIL import Image
-
-
+import os
 
 class ImageFeatureExtractor:
     def __init__(self, 
                  process_top_features,
-                 processor_path='backend/system/methods/downloadModel/model/local_vit_processor', 
-                 model_path='backend/system/methods/downloadModel/model/local_vit_model', 
+                 processor_path='D:/Github Local Repos/CBIR/backend/system/methods/downloadModel/model/local_vit_processor', 
+                 model_path='D:/Github Local Repos/CBIR/backend/system/methods/downloadModel/model/local_vit_model', 
                  predictionUpto=5):
-        self.processor = ViTImageProcessor.from_pretrained(processor_path)
-        self.model = ViTForImageClassification.from_pretrained(model_path)
+        # Check if the processor and model paths exist
+        if not os.path.exists(processor_path):
+            raise FileNotFoundError(f"Processor path not found: {processor_path}")
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"Model path not found: {model_path}")
+
+        # Load processor and model using Auto classes
+        self.processor = AutoImageProcessor.from_pretrained(processor_path)
+        self.model = AutoModelForImageClassification.from_pretrained(model_path)
         self.predictionUpto = predictionUpto
         self.process_top_features = process_top_features
 
@@ -35,7 +41,7 @@ class ImageFeatureExtractor:
             print(f"Error opening image {filename}: {e}")
             return []
 
-        # Now self.processor is callable
+        # Process the image
         inputs = self.processor(images=img, return_tensors="pt")
         
         with torch.no_grad():  # Disable gradient calculation

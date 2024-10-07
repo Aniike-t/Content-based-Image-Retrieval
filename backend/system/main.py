@@ -4,6 +4,7 @@ import os
 import io
 from utils.checkIfImage import is_valid_image
 from SQLmethods.connectDB import ConnectDB
+from SQLmethods.connectDB import get_db_manager
 from methods.getColors import ImageColorAnalyzer
 from methods.getMetadata import GetMetadata
 from methods.getFeaturesCNN import ImageFeatureExtractor
@@ -18,6 +19,10 @@ import logging
 app = Flask(__name__)
 CORS(app)
 
+# Get database connection and cursor
+cursor, conn = ConnectDB()
+db_manager = get_db_manager
+
 # Configure upload folder
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../storage')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -28,15 +33,16 @@ image_manager = ImageProcessingManager(
     upload_folder=UPLOAD_FOLDER,
     ImageColorAnalyzer=ImageColorAnalyzer,
     GetMetadata=GetMetadata,
-    ImageFeatureExtractor=ImageFeatureExtractor,
-    process_top_features =process_top_features
+    ImageFeatureExtractor =ImageFeatureExtractor,
+    process_top_features =process_top_features,
+    cursor = cursor,
+    conn = conn
 )
 
 
 # Store processing errors
 processing_errors = []
-# Get database connection and cursor
-c, conn = ConnectDB()
+
 
 
 
