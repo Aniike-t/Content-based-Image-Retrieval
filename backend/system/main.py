@@ -2,6 +2,14 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import io
+import spacy
+import nltk
+import threading
+import logging
+import pandas as pd
+from collections import defaultdict
+
+''' Import classes from other files '''
 from utils.checkIfImage import is_valid_image
 from SQLmethods.connectDB import ConnectDB
 from SQLmethods.connectDB import get_db_manager
@@ -11,8 +19,8 @@ from methods.getFeaturesCNN import ImageFeatureExtractor
 from ThreadPool.ImageProcessorManager import ImageProcessingManager
 from tokenisation.wordnetExtraction import process_top_features
 from tokenisation.SentenceConv import SentenceConverter
-import threading
-import logging
+from tokenisation.SQLqueryGenerator import SQLQueryGenerator
+from Retrieval.RetrieveAlgo import VectorSpaceModel
 
 
 # Initialize Flask app and CORS
@@ -127,6 +135,27 @@ def get_processing_errors():
     return jsonify({'message': 'No errors occurred during processing'}), 200
 
 
+def get_query_results(sentence=None):
+    
+    sentence = 'car tree sport'
+    
+    converter = SentenceConverter()
+    result = converter.convert_to_query(sentence)
+    print(result)
+    
+    query_generator = SQLQueryGenerator(result)
+    sql_query, included_words = query_generator.generate_query()
+    print(sql_query)
+    print(included_words)
+    
+    sql_query_result = get_db_manager().fetch_query_results(sql_query)
+    print(sql_query_result)
+    
+    vsm = VectorSpaceModel(sql_query_result, included_words)
+    sorted_vector_df = vsm.get_sorted_vector_df()
+    print(sorted_vector_df)
+
 
 if __name__ == '__main__':
+    get_query_results()
     app.run(debug=True)

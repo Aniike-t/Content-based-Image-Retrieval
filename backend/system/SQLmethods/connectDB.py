@@ -13,6 +13,11 @@ class DatabaseManager:
             self.cursor.execute(query, params)
             self.conn.commit()
 
+    def fetch_query_results(self, query, params=()):
+        with self.lock:  # Acquire the lock before executing the query
+            self.cursor.execute(query, params)
+            return self.cursor.fetchall()  # Fetch and return all results
+
     def close(self):
         self.cursor.close()
         self.conn.close()

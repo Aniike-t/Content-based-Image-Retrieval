@@ -1,0 +1,152 @@
+/* ImageSearch.css */
+
+/* Apply the background color */
+body {
+    background-color: #2b2828;
+    overflow-y: scroll; /* Ensure scroll always shows */
+    margin: 0; /* Remove default margin */
+    font-family: Arial, sans-serif; /* Optional: Set a default font */
+}
+
+/* Custom Scrollbar for Webkit browsers (Chrome, Safari, Edge) */
+body::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
+}
+
+body::-webkit-scrollbar-track {
+    background-color: #2b2828; /* Track color */
+    border-radius: 10px; /* Rounded corners for the track */
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: #2b2828; /* Thumb color */
+    border-radius: 10px; /* Rounded corners for the thumb */
+    border: 3px solid #2b2828; /* Adds some space around the thumb */
+}
+
+body::-webkit-scrollbar-thumb:hover {
+    background-color: #575757; /* Slightly lighter on hover */
+}
+
+/* Container and search bar */
+.search-container {
+    max-width: 1200px; /* Increased max width for larger screens */
+    margin: 0 auto;
+    text-align: center;
+    padding: 20px;
+    color: white;
+}
+
+input {
+    padding: 13px;
+    width: 500px;
+    margin-right: 10px;
+    border: 2px solid #747474; /* Customize the border color as needed */
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #2b2828;
+    color: white; /* Set text color to ensure visibility */
+}
+
+input:focus {
+    outline: none;
+}
+
+
+button {
+    padding: 10px;
+    margin-left: -60px;
+    position: fixed;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #b4b4b4;
+}
+
+/* Placeholder text before search */
+.placeholder {
+    margin-top: 10%;
+    color: #aaa;
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 10%;
+}
+
+/* Spinner */
+.spinner {
+    margin: 300px auto;
+    width: 100px;
+    height: 100px;
+    border-top: 6px solid #3498db; /* Blue */
+    border-radius: 70%;
+    animation: spin 1s linear infinite;
+}
+
+/* Keyframes for spinner animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Image grid (Responsive Grid Layout) */
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-gap: 15px;
+    margin-top: 10%;
+    padding-bottom: 20px; /* Add some padding at the bottom */
+}
+
+/* Image items */
+.image-item {
+    width: 100%;
+    height: 0;
+    padding-bottom: 75%; /* 4:3 Aspect Ratio */
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.2s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.image-item img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-item:hover {
+    transform: scale(1.05);
+}
+
+/* Load More Button (If Needed) */
+.load-more {
+    margin: 20px auto;
+    padding: 10px 30px;
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    display: block;
+}
+
+.load-more:hover {
+    background-color: #0f5bb7;
+}
+
+/* Error Message */
+.error-message {
+    color: #ff6b6b;
+    margin-top: 20px;
+    font-size: 18px;
+    text-align: center;
+}

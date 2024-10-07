@@ -48,6 +48,6 @@ class SentenceConverter:
 
 
 # converter = SentenceConverter()
-# sentence = "A car without wheel"
+# sentence = "A car behind tree without wheel"
 # result = converter.convert_to_query(sentence)
 # print(result)  # Output: car park -tree -bush

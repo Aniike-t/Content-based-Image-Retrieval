@@ -8,3 +8,5 @@ CREATE TABLE IF NOT EXISTS Imagefeatures (
 
 INSERT INTO Imagefeatures (filename, feature_type, feature_value, probability)
 VALUES ('image1.jpg', 'color', 'average_color_value', 0.9);
+
+SELECT * FROM Imagefeatures WHERE (feature_value = 'car') GROUP BY filename;
