@@ -8,6 +8,9 @@ import threading
 import logging
 import pandas as pd
 from collections import defaultdict
+from io import BytesIO
+import base64
+from PIL import Image
 
 ''' Import classes from other files '''
 from utils.checkIfImage import is_valid_image
@@ -135,27 +138,80 @@ def get_processing_errors():
     return jsonify({'message': 'No errors occurred during processing'}), 200
 
 
-def get_query_results(sentence=None):
-    
-    sentence = 'car tree sport'
-    
+@app.route('/search', methods=['POST'])
+def search_images():
+    """
+    Handle image search requests based on the query.
+    """
+    # Get JSON data from the request
+    data = request.get_json()
+
+    # Extract the query from the incoming request
+    query = data.get('query', '')
+
+    if not query:
+        return jsonify({'error': 'Query is required.'}), 400
+
+    try:
+        # Call the get_query_results function with the user query
+        filenames = get_query_results(sentence=query)
+
+        # Prepare a list to hold low-quality images
+        low_quality_images = []
+
+        for filename in filenames:
+            # Open the original image
+            with Image.open(filename) as img:
+                # Create a BytesIO object to hold the low-quality image
+                buffered = BytesIO()
+
+                # Resize the image and save it to the BytesIO object
+                img = img.resize(img.width , img.height )  # Resize to 25% of original
+                img.save(buffered, format='JPEG', quality=20)
+
+                # Get the binary data from the BytesIO object
+                low_quality_image_data = buffered.getvalue()
+
+                # Encode the binary data to base64
+                low_quality_image_base64 = base64.b64encode(low_quality_image_data).decode('utf-8')
+
+                # Append the base64 data to the list
+                low_quality_images.append(low_quality_image_base64)
+
+        return jsonify({'images': low_quality_images}), 200
+
+    except Exception as e:
+        logging.error(f"Error retrieving images: {str(e)}")
+        return jsonify({'error': 'Failed to fetch images. Please try again.'}), 500
+
+
+
+
+
+
+''' Query Processing logic'''
+def get_query_results(sentence):
+    """
+    Processes the sentence to fetch image filenames based on the query.
+    """
     converter = SentenceConverter()
     result = converter.convert_to_query(sentence)
     print(result)
-    
     query_generator = SQLQueryGenerator(result)
     sql_query, included_words = query_generator.generate_query()
     print(sql_query)
     print(included_words)
-    
     sql_query_result = get_db_manager().fetch_query_results(sql_query)
-    print(sql_query_result)
-    
+
     vsm = VectorSpaceModel(sql_query_result, included_words)
     sorted_vector_df = vsm.get_sorted_vector_df()
-    print(sorted_vector_df)
+
+    filenames = sorted_vector_df.index.tolist()
+
+    print(filenames)
+    return filenames
+
 
 
 if __name__ == '__main__':
-    get_query_results()
     app.run(debug=True)

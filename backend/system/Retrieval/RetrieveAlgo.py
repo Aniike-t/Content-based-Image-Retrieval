@@ -39,7 +39,7 @@ class VectorSpaceModel:
             # Check if the feature is in the included_words list
             query_weight = 1.0  # Default weight
             if feature in self.included_words:
-                query_weight = 2.0  # Example increased weight for included words
+                query_weight = 3.0  # Example increased weight for included words
             
             # Update the vector for this filename
             feature_index = features.index(feature)

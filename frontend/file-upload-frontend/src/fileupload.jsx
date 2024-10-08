@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import './App.css';
+import styles from './FileUpload.module.css'; // Import the CSS module
 
 const FileUpload = () => {
   const [selectedFiles, setSelectedFiles] = useState(null);
@@ -12,8 +12,6 @@ const FileUpload = () => {
   const handleFileChange = (e) => {
     const files = e.target.files;
     setSelectedFiles(files);
-
-    // Convert FileList to Array and map to file names
     setFileNames(Array.from(files).map(file => file.name));
   };
 
@@ -54,7 +52,6 @@ const FileUpload = () => {
     }
   };
 
-  // Function to check for processing errors
   const checkProcessingErrors = () => {
     fetch('/processing_errors')
       .then(response => response.json())
@@ -68,49 +65,58 @@ const FileUpload = () => {
       .catch(err => console.error('Error fetching processing errors:', err));
   };
 
-  // Show toast notification
   const showToastNotification = (message) => {
     toast.error(message);
   };
 
-  // Poll every 5 seconds to check for errors
   useEffect(() => {
     const interval = setInterval(checkProcessingErrors, 5000);
-    return () => clearInterval(interval); // Cleanup on component unmount
+    return () => clearInterval(interval);
   }, []);
 
-  // Limit number of files to display
   const displayFiles = fileNames.slice(0, 5);
   const additionalFilesCount = fileNames.length - displayFiles.length;
 
   return (
-    <>
+    <div className={styles.fileUploadContainer}>
       <title>CBIR system</title>
       <div>
-        <h2>Upload Files</h2>
-        <form onSubmit={handleSubmit}>
-          <input type="file" multiple onChange={handleFileChange} />
-          <button type="submit" color="#000">Upload</button>
+        <h2 style={{color:'white'}}>Upload Images</h2>
+        <form className={styles.fileUploadForm} onSubmit={handleSubmit}>
+          <label className={styles.customFileInput}>
+            Choose Files
+            <input
+              type="file"
+              multiple
+              onChange={handleFileChange}
+              className={styles.fileInput}
+            />
+            
+          </label>
+          <button type="submit" className={styles.uploadButton}>Upload</button>
         </form>
+        <br />
         {fileNames.length > 0 && (
           <div>
-            <h3 style={{ color: '#000' }}>Selected Files ({fileNames.length}):</h3>
-            <ul>
+            <h3 className={styles.selectedFilesHeader}>
+              Selected Files ({fileNames.length}):
+            </h3>
+            <ul className={styles.fileList}>
               {displayFiles.map((fileName, index) => (
-                <li key={index}>{fileName}</li>
+                <li key={index} className={styles.fileItem}>{fileName}</li>
               ))}
               {additionalFilesCount > 0 && (
-                <li>...and {additionalFilesCount} more file{additionalFilesCount > 1 ? 's' : ''}</li>
+                <li className={styles.fileItem}>
+                  ...and {additionalFilesCount} more file{additionalFilesCount > 1 ? 's' : ''}
+                </li>
               )}
             </ul>
           </div>
         )}
-        {message && <p className={isSuccess ? 'success' : 'error'}>{message}</p>}
-
-        {/* Toast Container for Notifications */}
+        {message && <p className={`${styles.message} ${isSuccess ? styles.success : styles.error}`}>{message}</p>}
         <ToastContainer />
       </div>
-    </>
+    </div>
   );
 };
 

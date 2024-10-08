@@ -29,7 +29,7 @@ body::-webkit-scrollbar-thumb:hover {
 }
 
 /* Container and search bar */
-.search-container {
+.container {
     max-width: 1200px; /* Increased max width for larger screens */
     margin: 0 auto;
     text-align: center;

@@ -1,4 +1,3 @@
-// ImageSearch.jsx
 import React, { useState } from 'react'; 
 import axios from 'axios';
 import './ImageSearch.css';
@@ -26,7 +25,7 @@ const ImageSearch = () => {
             // Replace 'http://localhost:5000/search' with your actual backend endpoint
             const response = await axios.post('http://localhost:5000/search', { query });
 
-            // Assuming your backend returns an array of image URLs in response.data.images
+            // Assuming your backend returns an array of base64 image strings in response.data.images
             setImages(response.data.images);
         } catch (err) {
             console.error('Error fetching images:', err);
@@ -37,7 +36,7 @@ const ImageSearch = () => {
     };
 
     return (
-        <div className="search-container">
+        <div className="container">
             <h1>Content-Based Image Retrieval System</h1>
             <form onSubmit={handleSearch}>
                 <input
@@ -67,7 +66,8 @@ const ImageSearch = () => {
             <div className="image-grid">
                 {images.map((image, index) => (
                     <div key={index} className="image-item">
-                        <img src={image} alt={`img-${index}`} loading="lazy" />
+                        {/* Set the src to the base64 image string */}
+                        <img src={`data:image/jpeg;base64,${image}`} alt={`img-${index}`} />
                     </div>
                 ))}
             </div>
