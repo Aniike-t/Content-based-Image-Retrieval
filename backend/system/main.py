@@ -166,8 +166,8 @@ def search_images():
                 buffered = BytesIO()
 
                 # Resize the image and save it to the BytesIO object
-                img = img.resize(img.width , img.height )  # Resize to 25% of original
-                img.save(buffered, format='JPEG', quality=20)
+                img = img.resize((img.width , img.height ))  # Resize to 25% of original
+                img.save(buffered, format='JPEG', quality=100)
 
                 # Get the binary data from the BytesIO object
                 low_quality_image_data = buffered.getvalue()

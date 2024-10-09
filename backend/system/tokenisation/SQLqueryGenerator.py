@@ -20,8 +20,8 @@ class SQLQueryGenerator:
                 self.excluded_words.append(word[1:])  # Remove the '-' for the excluded word
             else:
                 # Apply autocorrect on included words
-                corrected_word = self.spell(word)
-                self.included_words.append(corrected_word)
+                # corrected_word = word
+                self.included_words.append(word)
 
     def get_query_synonyms(self):
         # Generate a list of synonyms for each included word
