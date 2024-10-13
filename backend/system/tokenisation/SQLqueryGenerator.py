@@ -54,6 +54,7 @@ class SQLQueryGenerator:
                 self.sql_query += f" AND feature_value != '{word}'"
         
         self.sql_query += ") ORDER BY filename;"  # Add GROUP BY clause
+        print(self.sql_query)
         return self.sql_query, self.fixed_words
 
 # Example usage

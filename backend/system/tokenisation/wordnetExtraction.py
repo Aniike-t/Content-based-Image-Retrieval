@@ -3,6 +3,7 @@ from nltk.data import find
 from nltk.corpus import wordnet
 import nltk
 from nltk.tokenize import word_tokenize
+import math
 
 # Set NLTK data path to the current folder
 nltk_data_path = os.path.join(os.getcwd(), 'nltk_data')
@@ -25,7 +26,7 @@ def download_nltk_data():
 
 download_nltk_data()
 
-def get_synonyms(word, limit=3):
+def get_synonyms(word, limit=10):
     """Get top synonyms for a given word from WordNet, limited to a certain number."""
     synonyms = set()
     for syn in wordnet.synsets(word):
@@ -44,7 +45,7 @@ def process_top_features(features):
     processed_features = []
     
     features_sorted = sorted(features, key=lambda x: x['probability'], reverse=True)
-    top_half_count = len(features_sorted) // 2
+    top_half_count = math.ceil(len(features_sorted) // 2)
     top_features = features_sorted[:top_half_count]
     
     for feature in top_features:
@@ -59,7 +60,7 @@ def process_top_features(features):
                     "filename": feature['filename'],
                     "feature_type": feature['feature_type'],
                     "feature_value": synonym,
-                    "probability": feature['probability'] / 1.5
+                    "probability": feature['probability'] *0.35
                 })
     
     return processed_features

@@ -50,4 +50,4 @@ class SentenceConverter:
 # converter = SentenceConverter()
 # sentence = "A car behind tree without wheel"
 # result = converter.convert_to_query(sentence)
-# print(result)  # Output: car tree -bush
+# print(result)  # Output: car tree -wheel
