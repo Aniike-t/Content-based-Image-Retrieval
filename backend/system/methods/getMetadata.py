@@ -129,12 +129,13 @@ def GetMetadata(imagelink):
             "feature_value": "Software",
             "probability": image.info.get("software", "Unknown")
         })
+        # 1/2f
         
     except Exception as e:
         print(f"Error retrieving metadata: {str(e)}")
         
     print(metadata)
-    return metadata
+    return []
   
   
 # GetMetadata('backend/system/methods/HMD_Nokia_8.3_5G_hdr.jpg')
