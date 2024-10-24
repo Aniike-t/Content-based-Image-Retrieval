@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Form, Button, Card } from "react-bootstrap";
 import './login.css';
@@ -9,6 +9,17 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate(); // Initialize useNavigate
+
+
+    // Check for UUID when component mounts
+    useEffect(() => {
+      const uuid = localStorage.getItem('uuid');
+      console.log(uuid);
+      if (uuid){
+        localStorage.setItem('uuid', null);
+      }
+  }, [navigate]); // Dependency array includes navigate
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();

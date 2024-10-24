@@ -18,6 +18,7 @@ import sqlite3
 from cryptography.fernet import Fernet
 import cv2
 import numpy as np
+import pytesseract
 
 
 ''' Import classes from other files '''
@@ -68,31 +69,71 @@ def store_filename_and_hash(db_manager, filename, filehash, uuid):
     db_manager.execute_query(sql, (filename, filehash, uuid))
 
 
+
+
+
+
+
+
+
 def blur_faces(image):
-    """
-    Detect faces in the image and apply a blur to the detected regions.
-    """
-    # Convert the image to a NumPy array for OpenCV
     image_np = np.array(image)
-    # Convert the image to grayscale (needed for face detection)
     gray_image = cv2.cvtColor(image_np, cv2.COLOR_RGB2GRAY)
-    # Load the pre-trained Haar Cascade for face detection
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-    # Detect faces in the image
     faces = face_cascade.detectMultiScale(gray_image, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
-    # Apply blur to each detected face
     for (x, y, w, h) in faces:
-        # Extract the face region
         face_region = image_np[y:y+h, x:x+w]
-        # Apply a Gaussian blur to the face region
         blurred_face = cv2.GaussianBlur(face_region, (99, 99), 30)
-        # Replace the original face region with the blurred version
         image_np[y:y+h, x:x+w] = blurred_face
-    # Convert the NumPy array back to a PIL Image
     return Image.fromarray(image_np)
 
+def blur_text(image):
+    # Convert the PIL image to a NumPy array
+    image_np = np.array(image)
+    
+    # Convert the image to grayscale for text detection
+    gray_image = cv2.cvtColor(image_np, cv2.COLOR_RGB2GRAY)
+    
+    # Apply bilateral filter and find edges
+    bfilter = cv2.bilateralFilter(gray_image, 11, 17, 17)
+    edged = cv2.Canny(bfilter, 30, 200)
 
-def save_valid_files(files, uuid):
+    # Find contours
+    contours, _ = cv2.findContours(edged.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    contours = sorted(contours, key=cv2.contourArea, reverse=True)
+
+    # Prepare a mask for blurring
+    mask = np.zeros_like(image_np)
+
+    # Loop through contours to find bounding rectangles and blur them
+    for contour in contours:
+        perimeter = cv2.arcLength(contour, True)
+        approx = cv2.approxPolyDP(contour, 0.015 * perimeter, True)
+        if len(approx) == 4:  # Assuming a rectangular shape
+            x, y, w, h = cv2.boundingRect(contour)
+            roi = image_np[y:y+h, x:x+w]
+            blurred_roi = cv2.GaussianBlur(roi, (21, 21), 0)  # Increased blur
+            image_np[y:y+h, x:x+w] = blurred_roi  # Replace original ROI with blurred ROI
+            
+            # Optionally draw on the mask to visualize the blurring area
+            cv2.fillPoly(mask, [approx], (255, 255, 255))
+
+    # Combine the original image with the blurred area
+    result = cv2.bitwise_and(image_np, mask) + cv2.bitwise_and(image_np, ~mask)
+
+    # Convert back to PIL image
+    return Image.fromarray(result)
+
+
+
+
+
+
+
+
+
+
+def save_valid_files(files, uuid, face_blur_enabled, text_blur_enabled):
     """
     Save valid image files to the upload folder and return the valid and invalid files.
     """
@@ -101,47 +142,45 @@ def save_valid_files(files, uuid):
     for file in files:
         if file and file.filename:
             file_stream = io.BytesIO(file.read())
-            file.seek(0)  # Reset file stream position after reading
+            file.seek(0)
 
             if is_valid_image(file_stream):
                 valid_files.append(file)
             else:
                 invalid_files.append(file.filename)
 
-    # Save valid files and blur faces during saving
+    # Save valid files and blur faces and/or text if enabled
     for file in valid_files:
-        file.seek(0)  # Ensure the stream is reset before saving
-        image = Image.open(file)  # Open the image from the file stream
-        image = blur_faces(image)  # Blur faces before saving
+        file.seek(0)
+        image = Image.open(file)
+        if face_blur_enabled:  # Check if face blur is enabled
+            image = blur_faces(image)
+        if text_blur_enabled:  # Check if text blur is enabled
+            image = blur_text(image)
 
         image_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-        image.save(image_path)  # Save the processed image
+        image.save(image_path)
 
-        # Re-open the image for hashing
         file_stream = io.BytesIO(file.read())
-        file_stream.seek(0)  # Reset the stream again for hashing
-        file_hash = calculate_file_hash(file_stream)  # Calculate hash from the stream
-
-        store_filename_and_hash(db_manager, image_path, file_hash, uuid)  # Store filename and hash
-        
-        # Save valid files
-    for file in valid_files:
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
+        file_stream.seek(0)
+        file_hash = calculate_file_hash(file_stream)
+        store_filename_and_hash(db_manager, image_path, file_hash, uuid)
 
     return valid_files, invalid_files
 
 
 
 
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    """
-    Handle file uploads and process them using ImageProcessingManager.
-    """
     if 'files[]' not in request.files:
         return jsonify({'error': 'No files part'}), 400
+
     files = request.files.getlist('files[]')
-    uuid = request.form.get('uuid')  # Get UUID from the form data
+    uuid = request.form.get('uuid')
+    face_blur_enabled = request.form.get('faceBlur') == 'true'  # Get face blur option as boolean
+    text_blur_enabled = request.form.get('textBlur') == 'true'  # Get text blur option as boolean
 
     if not uuid:
         return jsonify({'error': 'UUID not provided.'}), 400
@@ -149,31 +188,24 @@ def upload_file():
     if not files:
         return jsonify({'error': 'No selected files'}), 400
 
-    # Save valid files
-    valid_files, invalid_files = save_valid_files(files, uuid)
+    valid_files, invalid_files = save_valid_files(files, uuid, face_blur_enabled, text_blur_enabled)
 
     def process_files_in_background(valid_files):
         global processing_errors
-        processing_errors = []  # Clear errors before each batch
-
-        # Process valid images
+        processing_errors = []
         for file in valid_files:
             try:
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-                image_manager.process_image(file_path)  # Pass the full file path
+                image_manager.process_image(file_path)
             except Exception as e:
-                # Log the error and store it for frontend notification
                 logging.error(f"Error processing {file.filename}: {str(e)}")
                 processing_errors.append({'file': file.filename, 'error': str(e)})
 
-        # Wait for all threads to finish processing
         image_manager.wait_for_completion()
 
-    # Run processing in a background thread
     background_thread = threading.Thread(target=process_files_in_background, args=(valid_files,))
     background_thread.start()
 
-    # Return a response immediately
     return jsonify({
         'message': 'Files are being processed in the background',
         'invalid_files': invalid_files,
@@ -221,8 +253,8 @@ def search_images():
 
         for filename in filenames:
             # Check if the filename is associated with the UUID
-            if not is_filename_associated_with_uuid(filename, uuid):
-                continue  # Skip if not associated
+            # if not is_filename_associated_with_uuid(filename, uuid):
+            #     continue  # Skip if not associated
 
             # Open the original image
             with Image.open(filename) as img:

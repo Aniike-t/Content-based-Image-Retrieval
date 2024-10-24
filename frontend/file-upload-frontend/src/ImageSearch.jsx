@@ -1,19 +1,43 @@
-import React, { useState } from 'react'; 
+import React, { useEffect ,useState } from 'react'; 
 import axios from 'axios';
 import './ImageSearch.css';
 import { FaSearch } from 'react-icons/fa'; // Ensure this path is correct
+import { useNavigate } from 'react-router-dom';
 
 const ImageSearch = () => {
     const [query, setQuery] = useState('');
     const [images, setImages] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const navigate = useNavigate(); // Initialize useNavigate
+
+
+
+    // Check for UUID when component mounts
+    useEffect(() => {
+        const uuid = localStorage.getItem('uuid');
+        console.log(uuid);
+        if (!uuid || uuid === 'undefined' || uuid === null || uuid === 'null' || uuid === '' || uuid === undefined) {
+            setError('UUID not found in localStorage.');
+            navigate('/login');
+        }
+    }, [navigate]); // Dependency array includes navigate
+
+
 
     // Handler for search form submission
     const handleSearch = async (e) => {
         e.preventDefault();
+
         if (!query.trim()) {
             setError('Please enter a query to get related images..');
+            return;
+        }
+
+        const uuid = localStorage.getItem('uuid'); // Get UUID from local storage
+        if (!uuid || uuid === 'undefined' || uuid === null || uuid === 'null' || uuid === '' || uuid === undefined) {
+            setError('UUID not found in localStorage.');
+            navigate('/login');
             return;
         }
 
@@ -22,8 +46,6 @@ const ImageSearch = () => {
         setImages([]);
 
         try {
-            const uuid = localStorage.getItem('uuid'); // Get UUID from local storage
-
             // Replace 'http://localhost:5000/search' with your actual backend endpoint
             const response = await axios.post('http://localhost:5000/search', { query, uuid }); // Send UUID with the query
 

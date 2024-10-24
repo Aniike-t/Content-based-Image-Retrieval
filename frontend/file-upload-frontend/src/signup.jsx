@@ -9,6 +9,16 @@ const Signup = () => {
     const [message, setMessage] = useState('');
     const navigate = useNavigate(); // Initialize useNavigate
 
+    // Check for UUID when component mounts
+    useEffect(() => {
+        const uuid = localStorage.getItem('uuid');
+        console.log(uuid);
+        if (uuid){
+          localStorage.setItem('uuid', null);
+        }
+    }, [navigate]); // Dependency array includes navigate
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage('');
