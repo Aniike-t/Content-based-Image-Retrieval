@@ -15,12 +15,12 @@ nltk.data.path.append(nltk_data_path)
 # Ensure necessary NLTK data is downloaded in the same folder
 def download_nltk_data():
     try:
-        find('corpora/wordnet.zip')
+        find('corpora/wordnet')  # Check for directory instead of .zip
     except LookupError:
         nltk.download('wordnet', download_dir=nltk_data_path)
 
     try:
-        find('tokenizers/punkt.zip')
+        find('tokenizers/punkt')  # Check for directory instead of .zip
     except LookupError:
         nltk.download('punkt', download_dir=nltk_data_path)
 
@@ -29,16 +29,23 @@ download_nltk_data()
 def get_synonyms(word, limit=10):
     """Get top synonyms for a given word from WordNet, limited to a certain number."""
     synonyms = set()
-    for syn in wordnet.synsets(word):
-        for lemma in syn.lemmas():
-            synonyms.add(lemma.name())
-            if len(synonyms) >= limit:
-                return list(synonyms)
+    try:
+        for syn in wordnet.synsets(word):
+            for lemma in syn.lemmas():
+                synonyms.add(lemma.name())
+                if len(synonyms) >= limit:
+                    return list(synonyms)
+    except Exception as e:
+        print(f"Error retrieving synonyms for {word}: {e}")
     return list(synonyms)
 
 def tokenize_phrase(phrase):
     """Tokenize multi-word phrases like 'sports car' into individual words."""
-    return word_tokenize(phrase)
+    try:
+        return word_tokenize(phrase)
+    except Exception as e:
+        print(f"Error tokenizing phrase {phrase}: {e}")
+        return []
 
 def process_top_features(features):
     """Process top features to find top synonyms and adjust probabilities."""
@@ -60,7 +67,7 @@ def process_top_features(features):
                     "filename": feature['filename'],
                     "feature_type": feature['feature_type'],
                     "feature_value": synonym,
-                    "probability": feature['probability'] *0.35
+                    "probability": feature['probability'] * 0.35
                 })
     
     return processed_features

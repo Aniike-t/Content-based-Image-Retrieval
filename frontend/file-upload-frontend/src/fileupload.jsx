@@ -29,6 +29,16 @@ const FileUpload = () => {
       formData.append('files[]', selectedFiles[i]);
     }
 
+    const userUUID = localStorage.getItem('uuid'); // Retrieve UUID from localStorage
+    if (!userUUID) {
+      setMessage('UUID not found in localStorage.');
+      setIsSuccess(false);
+      toast.error('UUID not found.');
+      return;
+    }
+    
+    formData.append('uuid', userUUID); // Add UUID to form data
+
     try {
       const response = await fetch('http://localhost:5000/upload', {
         method: 'POST',
@@ -81,7 +91,7 @@ const FileUpload = () => {
     <div className={styles.fileUploadContainer}>
       <title>CBIR system</title>
       <div>
-        <h2 style={{color:'white'}}>Upload Images</h2>
+        <h2 style={{ color: 'white' }}>Upload Images</h2>
         <form className={styles.fileUploadForm} onSubmit={handleSubmit}>
           <label className={styles.customFileInput}>
             Choose Files
@@ -91,7 +101,6 @@ const FileUpload = () => {
               onChange={handleFileChange}
               className={styles.fileInput}
             />
-            
           </label>
           <button type="submit" className={styles.uploadButton}>Upload</button>
         </form>

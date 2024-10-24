@@ -1,5 +1,6 @@
 import os
 import threading
+import random
 from PIL import Image
 
 class ImageProcessingManager:
@@ -71,6 +72,7 @@ class ImageProcessingManager:
             
             # Commit the changes
             self.conn.commit()
+            print("Done with file processing - " + str(random.randint(100000, 999999)))
 
     def wait_for_completion(self):
         # Wait for all threads to finish

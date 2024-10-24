@@ -22,8 +22,10 @@ const ImageSearch = () => {
         setImages([]);
 
         try {
+            const uuid = localStorage.getItem('uuid'); // Get UUID from local storage
+
             // Replace 'http://localhost:5000/search' with your actual backend endpoint
-            const response = await axios.post('http://localhost:5000/search', { query });
+            const response = await axios.post('http://localhost:5000/search', { query, uuid }); // Send UUID with the query
 
             // Assuming your backend returns an array of base64 image strings in response.data.images
             setImages(response.data.images);
@@ -36,37 +38,36 @@ const ImageSearch = () => {
     };
 
     return (
-        <div className="container">
-            <h1>Content-Based Image Retrieval System</h1>
-            <form onSubmit={handleSearch}>
+        <div className="cbir-container">
+            <h1 className="cbir-title">Content-Based Image Retrieval System</h1>
+            <form className="cbir-form" onSubmit={handleSearch}>
                 <input
+                    className="cbir-input"
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search images..."
                 />
-                <button type="submit"><FaSearch/></button>
+                <button className="cbir-button" type="submit"><FaSearch /></button>
             </form>
 
-            {loading && <div className="spinner"></div>}
+            {loading && <div className="cbir-spinner"></div>}
 
-            {error && <div className="error-message">{error}</div>}
+            {error && <div className="cbir-error-message">{error}</div>}
             
-            {/* Conditionally render the hr tag only if images are present */}
             {images.length > 0 && (
-                <hr style={{ marginTop: '5%', opacity: '50%', border: '1.7px solid', width: '100%', borderRadius: '20px' }} />
+                <hr className="cbir-divider" />
             )}
 
             {!images.length && !loading && !error && (
-                <div className="placeholder">
+                <div className="cbir-placeholder">
                     <p>No Content to show</p>
                 </div>
             )}
 
-            <div className="image-grid">
+            <div className="cbir-image-grid">
                 {images.map((image, index) => (
-                    <div key={index} className="image-item">
-                        {/* Set the src to the base64 image string */}
+                    <div key={index} className="cbir-image-item">
                         <img src={`data:image/jpeg;base64,${image}`} alt={`img-${index}`} />
                     </div>
                 ))}

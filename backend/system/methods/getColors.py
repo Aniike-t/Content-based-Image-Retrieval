@@ -22,7 +22,9 @@ class ImageColorAnalyzer:
             "Green": [(36, 85)],
             "Blue": [(86, 125)],
             "Purple": [(126, 145)],
-            "Brown": [(146, 160)]
+            "Brown": [(146, 160)],
+            "Black": [(0, 180)],  # Full hue range with very low saturation and value
+            "White": [(0, 180)]   # Full hue range with very high value (brightness)
         }
         
         # Extended color palette (more detailed hues for deeper analysis)

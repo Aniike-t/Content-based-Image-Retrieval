@@ -134,7 +134,7 @@ def GetMetadata(imagelink):
     except Exception as e:
         print(f"Error retrieving metadata: {str(e)}")
         
-    print(metadata)
+    # print(metadata)
     return []
   
   

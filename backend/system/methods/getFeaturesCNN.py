@@ -79,6 +79,9 @@ class ImageFeatureExtractor:
                     q_feature['probability'] *= 1.25
         return quadrant_features
 
+    def filter_low_probabilities(self, processed_feature_list, threshold=0.0005):
+        return [feature for feature in processed_feature_list if feature['probability'] >= threshold]
+
     def get_features(self, filename):
         try:
             img = Image.open(filename).convert("RGB")
@@ -102,5 +105,6 @@ class ImageFeatureExtractor:
 
         # Combine processed features
         processed_feature_list_added = processed_feature_list + processed_feature_list_extra
+        processed_feature_list_added = self.filter_low_probabilities(processed_feature_list_added)
         print(processed_feature_list_added)
         return processed_feature_list_added

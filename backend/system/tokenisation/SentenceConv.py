@@ -6,7 +6,7 @@ import re
 import nltk
 
 '''Download necessary NLTK data (only needed the first time)'''
-# nltk.download('stopwords')
+nltk.download('stopwords')
 
 class SentenceConverter:
     def __init__(self):
