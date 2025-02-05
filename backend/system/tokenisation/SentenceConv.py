@@ -35,11 +35,11 @@ class SentenceConverter:
                 next_word = doc[i + 1] if i + 1 < len(doc) else None
                 if next_word and next_word.text not in self.stop_words:  # Ensure it's not a stopword
                     stemmed_word = self.ps.stem(next_word.text)
-                    excluded_words.append((next_word.text, f"-{stemmed_word}"))  # Include original and stemmed
+                    excluded_words.append(f"-{stemmed_word}")
                     negated_words.add(next_word.text)
             elif token.text not in self.stop_words and token.text not in negated_words:
                 stemmed_word = self.ps.stem(token.text)
-                included_words.append(token.text+" "+stemmed_word)  # Include original and stemmed
+                included_words.append(stemmed_word)
 
         # Construct and return the final query
         return ' '.join(included_words + excluded_words)

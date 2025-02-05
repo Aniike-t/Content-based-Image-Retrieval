@@ -34,10 +34,6 @@ from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
 import os
 
-from PIL import Image
-from PIL.ExifTags import TAGS, GPSTAGS
-import os
-
 def GetMetadata(imagelink):
     metadata = []
     try:
@@ -132,7 +128,12 @@ def GetMetadata(imagelink):
         # 1/2f
         
     except Exception as e:
-        print(f"Error retrieving metadata: {str(e)}")
+        metadata.append({
+            "filename": imagelink,
+            "feature_type": "Error",
+            "feature_value": "Error Message",
+            "probability": str(e)
+        })
         
     # print(metadata)
     return []

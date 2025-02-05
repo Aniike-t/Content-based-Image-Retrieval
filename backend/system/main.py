@@ -262,8 +262,13 @@ def search_images():
                 buffered = BytesIO()
 
                 # Resize the image and save it to the BytesIO object
+<<<<<<< HEAD
                 img = img.resize((img.width, img.height))  # Resize to 25% of original
                 img.save(buffered, format='JPEG', quality=100)
+=======
+                img = img.resize(img.width , img.height )  # Resize to 25% of original
+                img.save(buffered, format='JPEG', quality=20)
+>>>>>>> parent of c36b9f5 (+word convertor fix)
 
                 # Get the binary data from the BytesIO object
                 low_quality_image_data = buffered.getvalue()
