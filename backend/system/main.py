@@ -263,8 +263,13 @@ def search_images():
 
                 # Resize the image and save it to the BytesIO object
 <<<<<<< HEAD
+<<<<<<< HEAD
                 img = img.resize((img.width, img.height))  # Resize to 25% of original
                 img.save(buffered, format='JPEG', quality=100)
+=======
+                img = img.resize(img.width , img.height )  # Resize to 25% of original
+                img.save(buffered, format='JPEG', quality=20)
+>>>>>>> parent of c36b9f5 (+word convertor fix)
 =======
                 img = img.resize(img.width , img.height )  # Resize to 25% of original
                 img.save(buffered, format='JPEG', quality=20)
