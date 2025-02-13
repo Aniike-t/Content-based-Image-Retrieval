@@ -106,5 +106,4 @@ class ImageFeatureExtractor:
         # Combine processed features
         processed_feature_list_added = processed_feature_list + processed_feature_list_extra
         processed_feature_list_added = self.filter_low_probabilities(processed_feature_list_added)
-        print(processed_feature_list_added)
         return processed_feature_list_added

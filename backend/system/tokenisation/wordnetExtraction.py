@@ -3,7 +3,6 @@ from nltk.data import find
 from nltk.corpus import wordnet
 import nltk
 from nltk.tokenize import word_tokenize
-import math
 
 # Set NLTK data path to the current folder
 nltk_data_path = os.path.join(os.getcwd(), 'nltk_data')
@@ -15,44 +14,37 @@ nltk.data.path.append(nltk_data_path)
 # Ensure necessary NLTK data is downloaded in the same folder
 def download_nltk_data():
     try:
-        find('corpora/wordnet')  # Check for directory instead of .zip
+        find('corpora/wordnet.zip')
     except LookupError:
         nltk.download('wordnet', download_dir=nltk_data_path)
 
     try:
-        find('tokenizers/punkt')  # Check for directory instead of .zip
+        find('tokenizers/punkt.zip')
     except LookupError:
         nltk.download('punkt', download_dir=nltk_data_path)
 
 download_nltk_data()
 
-def get_synonyms(word, limit=10):
+def get_synonyms(word, limit=3):
     """Get top synonyms for a given word from WordNet, limited to a certain number."""
     synonyms = set()
-    try:
-        for syn in wordnet.synsets(word):
-            for lemma in syn.lemmas():
-                synonyms.add(lemma.name())
-                if len(synonyms) >= limit:
-                    return list(synonyms)
-    except Exception as e:
-        print(f"Error retrieving synonyms for {word}: {e}")
+    for syn in wordnet.synsets(word):
+        for lemma in syn.lemmas():
+            synonyms.add(lemma.name())
+            if len(synonyms) >= limit:
+                return list(synonyms)
     return list(synonyms)
 
 def tokenize_phrase(phrase):
     """Tokenize multi-word phrases like 'sports car' into individual words."""
-    try:
-        return word_tokenize(phrase)
-    except Exception as e:
-        print(f"Error tokenizing phrase {phrase}: {e}")
-        return []
+    return word_tokenize(phrase)
 
 def process_top_features(features):
     """Process top features to find top synonyms and adjust probabilities."""
     processed_features = []
     
     features_sorted = sorted(features, key=lambda x: x['probability'], reverse=True)
-    top_half_count = math.ceil(len(features_sorted) // 2)
+    top_half_count = len(features_sorted) // 2
     top_features = features_sorted[:top_half_count]
     
     for feature in top_features:
@@ -67,7 +59,7 @@ def process_top_features(features):
                     "filename": feature['filename'],
                     "feature_type": feature['feature_type'],
                     "feature_value": synonym,
-                    "probability": feature['probability'] * 0.35
+                    "probability": feature['probability'] / 1.5
                 })
     
     return processed_features

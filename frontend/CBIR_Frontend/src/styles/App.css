@@ -1,0 +1,291 @@
+@import './variables.css';
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-header .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 1rem;
+  }
+  
+  .theme-toggle-button {
+    background-color: var(--accent-color);
+    color: var(--text-color-light);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+  }
+  
+  .theme-toggle-button:hover {
+    background-color: var(--primary-color);
+  }
+.app-header h1 {
+  margin: 20px;
+  font-size: 2rem;
+}
+
+.app-main {
+  flex: 1;
+  padding: 2rem;
+}
+
+.spinner {
+  border: 4px solid var(--secondary-color);
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 2rem auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.no-results {
+  text-align: center;
+  margin-top: 2rem;
+  color: var(--text-color-dark);
+}
+
+/* SearchBar Styling */
+.search-bar {
+    outline: none;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+  
+  .search-bar input {
+    outline: none;
+    width: 400px;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 20px;
+    font-size: 1rem;
+    margin-right: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color:var(--search-bar-color);
+    color: var(--text-color-dark);
+  }
+  
+  .search-bar button {
+    background-color: var(--primary-color);
+    color: var(--text-color-light);
+    border: none;
+    padding: 0.8rem 1.2rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s ease;
+  }
+  
+  .search-bar button:hover {
+    background-color: var(--accent-color);
+  }
+  
+  /* ImageGrid Styling */
+  .image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+  
+  .image-item {
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+  }
+  
+  .image-item:hover {
+    transform: translateY(-5px);
+  }
+  
+  .image-item {
+    position: relative; /* Make the container relative for absolute positioning */
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+  }
+  
+  .image-item:hover {
+    transform: translateY(-5px);
+  }
+  
+  .image-item img {
+    border-radius: 10px;
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  
+  
+  .feedback-buttons {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the buttons */
+    display: flex;
+    gap: 10px; /* Add some space between the buttons */
+    opacity: 0; /* Initially hidden */
+    transition: opacity 0.3s ease; /* Smooth transition */
+  }
+  
+  .image-item:hover .feedback-buttons {
+    opacity: 1; /* Show buttons on hover */
+  }
+  
+  .feedback-button {
+      background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+      color: white;
+      border: none;
+      padding: 0.5rem;
+      border-radius: 50%; /* Make buttons circular */
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: background-color 0.2s ease, transform 0.2s ease;  /* Smooth transition */
+  }
+  .feedback-button.positive:hover{
+      background-color: green;
+      transform: scale(1.2);
+  }
+  .feedback-button.negative:hover {
+      background-color: red;
+      transform: scale(1.2);
+  }
+  
+  /* UploadArea Styling */
+  .upload-area {
+    width: 75%;
+    border: 2px dashed var(--primary-color);
+    padding: 2rem;
+    text-align: center;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-bottom: 2rem;
+  }
+  
+  .upload-area.dragging {
+    background-color: rgba(0, 128, 128, 0.1); /* Light teal overlay */
+  }
+  
+  .upload-area p {
+    color: var(--text-color-dark);
+    font-size: 1rem;
+  }
+  
+  /* Footer Styling */
+  .footer {
+    background-color: var(--primary-color);
+    color: var(--text-color-dark);
+    text-align: center;
+    padding: 1rem;
+    margin-top: auto; /* Push footer to the bottom */
+  }
+  
+  .footer p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+
+/* Improved Sentence Input Styling */
+.sentence-input-area {
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  align-items: center; /* Center elements horizontally */
+  margin-top: 0.5rem; /* Add some space above the input */
+  padding: 0.5rem;
+  border-top: 1px solid var(--border-color); /* Subtle border */
+}
+
+.sentence-input {
+  width: 90%; /* Take up most of the container width */
+  max-width: 400px; /* But don't get too wide */
+  padding: 0.6rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem; /* Space between input and button */
+    background-color:var(--search-bar-color);
+    color: var(--text-color-dark);
+  outline: none; /* Remove default outline */
+}
+
+.sentence-input:focus {
+  border-color: var(--accent-color); /* Highlight on focus */
+  box-shadow: 0 0 3px rgba(0, 123, 255, 0.3); /* Add a subtle shadow */
+}
+
+.sentence-submit-button {
+  background-color: var(--primary-color);
+  color: var(--text-color-light);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+  width: auto; /* Let the button size to its content */
+  align-self: center; /* Center the button */
+}
+
+.sentence-submit-button:hover {
+  background-color: var(--accent-color);
+}
+
+/* App.css (or wherever your styles are) */
+.home-button {
+  background-color: var(--accent-color); /* Or your preferred color */
+  color: white;
+  width: 50px;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 15px; /* Circular button */
+  cursor: pointer;
+  font-size: 0.8rem;
+  margin-right: 0.5rem; /* Space between home and theme button*/
+  transition: background-color 0.2s ease;
+
+}
+
+.home-button:hover {
+  background-color: var(--primary-color);
+}
+
+body::-webkit-scrollbar {
+  width: 12px;               /* width of the entire scrollbar */
+}
+
+body::-webkit-scrollbar-track {
+  background: rgba(255, 166, 0, 0);        /* color of the tracking area */
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 255, 0);    /* color of the scroll thumb */
+  border-radius: 20px;       /* roundness of the scroll thumb */
+  border: 3px solid rgba(255, 166, 0, 0);  /* creates padding around scroll thumb */
+}

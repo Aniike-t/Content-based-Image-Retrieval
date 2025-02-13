@@ -1,6 +1,7 @@
+# --- START OF FILE ImageProcessorManager.py --- (Corrected)
+
 import os
 import threading
-import random
 from PIL import Image
 
 class ImageProcessingManager:
@@ -12,18 +13,17 @@ class ImageProcessingManager:
         self.process_top_features = process_top_features
         self.cursor = cursor
         self.conn = conn
-        self.results = []  # Store results from all threads
-        self.lock = threading.Lock()  # Lock for thread safety
+        self.results = []
+        self.lock = threading.Lock()
         self.threads = []
 
-    def process_image(self, filename):
-        # Construct the full path
-        filepath = os.path.join(self.upload_folder, filename)
-        thread = threading.Thread(target=self.image_processing_thread, args=(filepath,))
+    def process_image(self, base_filename):
+        filepath = os.path.join(self.upload_folder, base_filename)
+        thread = threading.Thread(target=self.image_processing_thread, args=(filepath, base_filename)) # Pass base_filename
         self.threads.append(thread)
         thread.start()
 
-    def image_processing_thread(self, filepath):
+    def image_processing_thread(self, filepath, base_filename):  # Add base_filename parameter
         try:
             res1 = self.analyze_colors(filepath)
             res2 = self.get_metadata(filepath)
@@ -31,70 +31,65 @@ class ImageProcessingManager:
 
             # Use lock to safely append results
             with self.lock:
-                self.results.append((res1, res2, res3))
+                self.results.append((base_filename, res1, res2, res3))  # Store base_filename
+
         except Exception as e:
             print(f"Error processing {filepath}: {e}")
 
     def analyze_colors(self, filepath):
         analyzer = self.ImageColorAnalyzer(filepath)
-        return analyzer.full_color_analysis()  # Return the results
+        return analyzer.full_color_analysis()
 
     def get_metadata(self, filepath):
-        return self.GetMetadata(filepath)  # Return the results
-    
+        return self.GetMetadata(filepath)
+
     def extract_features(self, filepath):
         feature_extractor = self.ImageFeatureExtractor(self.process_top_features)
-        return feature_extractor.get_features(filepath)  # Return the results
+        return feature_extractor.get_features(filepath)
 
     def insert_data(self):
-        with self.lock:  # Lock for thread-safe database insertion
-            for res1, res2, res3 in self.results:
-                # Insert color analysis (res1) data
+        with self.lock:
+            for base_filename, res1, res2, res3 in self.results:  # Unpack base_filename
+                if not base_filename:  # Skip if base_filename is empty
+                    continue
+
+                # Insert color analysis data
                 for item in res1:
-                    self.cursor.execute(''' 
-                        INSERT INTO Imagefeatures (filename, feature_type, feature_value, probability)
-                        VALUES (?, ?, ?, ?)
-                    ''', (item['filename'], item['feature_type'], str(item['feature_value']), item['probability']))
+                    try:
+                        self.cursor.execute('''
+                            INSERT INTO Imagefeatures (filename, feature_type, feature_value, probability)
+                            VALUES (?, ?, ?, ?)
+                        ''', (base_filename, item['feature_type'], str(item['feature_value']), float(item['probability'])))
+                    except (ValueError, TypeError) as e:
+                        print(f"Error inserting color data for {base_filename}: {e}")
+                        continue  # Skip to the next item
 
-                # Insert metadata (res2) data
+                # Insert metadata
                 for item in res2:
-                    self.cursor.execute(''' 
-                        INSERT INTO Imagefeatures (filename, feature_type, feature_value, probability)
-                        VALUES (?, ?, ?, ?)
-                    ''', (item['filename'], item['feature_type'], str(item['feature_value']), item['probability']))
+                    try:
+                        self.cursor.execute('''
+                            INSERT INTO Imagefeatures (filename, feature_type, feature_value, probability)
+                            VALUES (?, ?, ?, ?)
+                        ''', (base_filename, item['feature_type'], str(item['feature_value']), float(item['probability'])))
+                    except (ValueError, TypeError) as e:
+                        print(f"Error inserting metadata for {base_filename}: {e}")
+                        continue  # Skip
 
-                # Insert feature extraction (res3) data
+                # Insert feature extraction data
                 for item in res3:
-                    self.cursor.execute(''' 
-                        INSERT INTO Imagefeatures (filename, feature_type, feature_value, probability)
-                        VALUES (?, ?, ?, ?)
-                    ''', (item['filename'], item['feature_type'], str(item['feature_value']), item['probability']))
-            
-            # Commit the changes
+                    try:
+                        self.cursor.execute('''
+                            INSERT INTO Imagefeatures (filename, feature_type, feature_value, probability)
+                            VALUES (?, ?, ?, ?)
+                        ''', (base_filename, item['feature_type'], str(item['feature_value']), float(item['probability'])))
+                    except (ValueError, TypeError) as e:
+                        print(f"Error inserting feature data for {base_filename}: {e}")
+                        continue
+
             self.conn.commit()
-            print("Done with file processing - " + str(random.randint(100000, 999999)))
+
 
     def wait_for_completion(self):
-        # Wait for all threads to finish
         for thread in self.threads:
             thread.join()
-        
-        # After all threads are done, insert data into the database
         self.insert_data()
-
-# Usage example (in your Flask route):
-# image_manager = ImageProcessingManager(
-#     upload_folder='path_to_upload_folder',
-#     ImageColorAnalyzer=YourImageColorAnalyzerClass,
-#     GetMetadata=YourGetMetadataClass,
-#     ImageFeatureExtractor=YourImageFeatureExtractorClass,
-#     process_top_features=YourProcessTopFeatures,
-#     cursor=your_database_cursor,
-#     conn=your_database_connection
-# )
-
-# For each valid file:
-# image_manager.process_image(file)
-
-# After processing all images:
-# image_manager.wait_for_completion()

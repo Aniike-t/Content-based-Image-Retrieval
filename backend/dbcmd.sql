@@ -1,25 +1,34 @@
+-- --- START OF FILE dbcmd.sql ---
+-- Create the Imagefeatures table if it doesn't exist
 CREATE TABLE IF NOT EXISTS Imagefeatures (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     filename TEXT NOT NULL,
-    feature_type TEXT NOT NULL,  -- e.g., 'color', 'CNN', 'metadata'
-    feature_value BLOB,          -- Store feature values, could be a string or binary data
-    probability REAL           -- Optional: Store probability associated with the feature
+    feature_type TEXT NOT NULL,
+    feature_value TEXT,
+    probability REAL
 );
 
-CREATE TABLE IF NOT EXISTS ImageHashes (
+-- Create an index on the filename column for faster lookups
+CREATE INDEX IF NOT EXISTS idx_filename ON Imagefeatures (filename);
+
+-- Create an index on the feature_value column for faster lookups
+CREATE INDEX IF NOT EXISTS idx_feature_value ON Imagefeatures (feature_value);
+
+-- Create a table for storing feedback history (optional but recommended)
+CREATE TABLE IF NOT EXISTS FeedbackHistory (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    filename TEXT,
+    feedback TEXT,  -- "positive" or "negative"
+    query TEXT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create UserSentences table
+CREATE TABLE IF NOT EXISTS UserSentences (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     filename TEXT NOT NULL,
-    filehash TEXT NOT NULL,  -- Store hash of the file (e.g., MD5, SHA256)
-    uuid TEXT NOT NULL
+    sentence TEXT NOT NULL
 );
 
-
-CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL UNIQUE,
-    hashed_password TEXT NOT NULL,   -- Store the hashed password
-    uuid TEXT NOT NULL UNIQUE,              -- Store the UUID for the user
-    creation_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Account creation timestamp
-    unique_key TEXT NOT NULL         -- Key made up of account creation time and UUID
-);
-
+-- Index for UserSentences
+CREATE INDEX IF NOT EXISTS idx_user_sentences_filename ON UserSentences (filename);

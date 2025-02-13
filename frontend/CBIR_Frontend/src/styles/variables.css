@@ -1,0 +1,20 @@
+:root {
+    /* Light Theme */
+    --primary-color: #008080; /* Teal */
+    --secondary-color: #f5f5f5; /* Light Gray */
+    --text-color-dark: #333333; /* Dark Gray */
+    --text-color-light: #ffffff; /* White */
+    --accent-color: #006666; /* Darker Teal */
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --search-bar-color: #f5f5f5; /* Light Gray */
+  }
+  
+  /* Dark Theme */
+  .dark-theme {
+    --primary-color: #00b8d4; /* Lighter Teal (for dark bg) */
+    --secondary-color: #212121; /* Dark Gray */
+    --text-color-dark: #f5f5f5; /* Light Gray */
+    --text-color-light: #ffffff; /* White */
+    --accent-color: #0097a7; /* Darker Teal (for dark bg) */
+    --search-bar-color: #2c2c2c;
+  }

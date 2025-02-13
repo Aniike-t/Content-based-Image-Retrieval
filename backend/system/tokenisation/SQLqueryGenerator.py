@@ -2,7 +2,7 @@ import nltk
 from nltk.corpus import wordnet
 from autocorrect import Speller  # Use Speller from autocorrect
 
-nltk.download('wordnet')
+# nltk.download('wordnet') # commented as it was downloaded in worknetExtraction
 
 class SQLQueryGenerator:
     def __init__(self, result):
@@ -20,8 +20,8 @@ class SQLQueryGenerator:
                 self.excluded_words.append(word[1:])  # Remove the '-' for the excluded word
             else:
                 # Apply autocorrect on included words
-                corrected_word = self.spell(word)
-                self.included_words.append(corrected_word)
+                # corrected_word = word
+                self.included_words.append(word)
 
     def get_query_synonyms(self):
         # Generate a list of synonyms for each included word
@@ -54,11 +54,4 @@ class SQLQueryGenerator:
                 self.sql_query += f" AND feature_value != '{word}'"
         
         self.sql_query += ") ORDER BY filename;"  # Add GROUP BY clause
-        print(self.sql_query)
         return self.sql_query, self.fixed_words
-
-# Example usage
-# result = "car behind tree -wheel"
-# query_generator = SQLQueryGenerator(result)
-# sql_query = query_generator.generate_query()
-# print(sql_query)

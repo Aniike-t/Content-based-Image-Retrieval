@@ -125,11 +125,4 @@ class ImageColorAnalyzer:
         """
         basic_colors = self.analyze_colors_basic()
         dominant_colors = self.analyze_dominant_colors()
-        print(basic_colors + dominant_colors)
         return basic_colors + dominant_colors
-
-# Example usage
-
-# analyzer = ImageColorAnalyzer("backend/system/methods/carparkedneartree.jpeg", num_clusters=5)
-# color_info = analyzer.full_color_analysis()
-# print(color_info)
