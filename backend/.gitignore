@@ -1,0 +1,9 @@
+*.pyc
+system/methods/__pycache__
+system/methods/downloadModel
+system/Retrieval/__pycache__
+system/SQLmethods/__pycache__
+system/ThreadPool/__pycache__
+system/tokenisation/__pycache__
+system/utils/__pycache__
+system/methods/METHODS.md
