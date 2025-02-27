@@ -1,0 +1,8 @@
+flask
+flask-cors
+Pillow
+torch
+transformers
+scikit-learn
+nltk
+spacy

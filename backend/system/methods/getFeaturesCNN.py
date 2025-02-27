@@ -6,8 +6,8 @@ import os
 class ImageFeatureExtractor:
     def __init__(self, 
                  process_top_features,
-                 processor_path='D:/Github Local Repos/CBIR/backend/system/methods/downloadModel/model/local_vit_processor', 
-                 model_path='D:/Github Local Repos/CBIR/backend/system/methods/downloadModel/model/local_vit_model', 
+                 processor_path='Model Preprocessor Path', 
+                 model_path='Model Path', 
                  predictionUpto=5):
         # Check if the processor and model paths exist
         if not os.path.exists(processor_path):

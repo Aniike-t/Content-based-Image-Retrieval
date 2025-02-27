@@ -7,3 +7,4 @@ system/ThreadPool/__pycache__
 system/tokenisation/__pycache__
 system/utils/__pycache__
 system/methods/METHODS.md
+database.db
